@@ -38,6 +38,28 @@ router.post('/register', (req, res) => {
   if (!['medecin', 'patient'].includes(role)) {
     return res.status(400).json({ error: 'Role invalide.' });
   }
+  if (role === 'patient' && birth_date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birth_date)) {
+      return res.status(400).json({ error: 'La date de naissance est invalide.' });
+    }
+
+    const birthDate = new Date(`${birth_date}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [year, month, day] = birth_date.split('-').map(Number);
+    if (
+      Number.isNaN(birthDate.getTime()) ||
+      birthDate.getFullYear() !== year ||
+      birthDate.getMonth() !== month - 1 ||
+      birthDate.getDate() !== day
+    ) {
+      return res.status(400).json({ error: 'La date de naissance est invalide.' });
+    }
+    if (birthDate > today) {
+      return res.status(400).json({ error: 'La date de naissance ne peut pas etre dans le futur.' });
+    }
+  }
 
   const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
   if (existing) {

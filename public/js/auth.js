@@ -75,6 +75,16 @@ const registerRole = document.getElementById('registerRole');
 const doctorFields = document.getElementById('doctorFields');
 const patientFields = document.getElementById('patientFields');
 const registerDoctor = document.getElementById('registerDoctor');
+const registerBirthDate = document.getElementById('registerBirthDate');
+
+// Empêche la sélection d'une date de naissance ultérieure à aujourd'hui.
+if (registerBirthDate) {
+  const today = new Date();
+  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .split('T')[0];
+  registerBirthDate.max = localToday;
+}
 
 async function loadDoctorsForSelection() {
   try {
@@ -165,7 +175,7 @@ registerForm.addEventListener('submit', async (e) => {
     }
 
     payload.assigned_doctor_id = selectedDoctorId;
-    payload.birth_date = document.getElementById('registerBirthDate').value;
+    payload.birth_date = registerBirthDate.value;
     payload.gender = document.getElementById('registerGender').value;
   }
 
